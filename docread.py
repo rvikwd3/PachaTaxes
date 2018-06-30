@@ -37,6 +37,7 @@ def main():
 
 def tableText(table):
     table_text = ""
+    old_text = ""
 
 #   Number of rows & Columns
     print 'Rows:\t{}'.format(table.rows.__len__())
@@ -51,12 +52,18 @@ def tableText(table):
             #   (i,j) goes out of cell range for some reason
             #   -> we handle the "out of index range" error
                 try:
-                    print '({},{}):\t{}'.format(i,j,table.cell(i,j).text)
-                    table_text += table.cell(i,j).text
+                    new_text = table.cell(i,j).text
                 except IndexError:
                     print '\t\tIndex Error at ({},{})'.format(i,j)
                     pass
 
+                #Check if text is repeated
+                if(old_text == new_text):
+                    print "Repeated:\t{}".format(new_text)
+                else:
+                    print '({},{}):\t{}'.format(i,j,table.cell(i,j).text)
+                    table_text += new_text+" "
+                    old_text = new_text
 
     return table_text
 
