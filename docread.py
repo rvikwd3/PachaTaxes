@@ -23,7 +23,7 @@ def main():
         print "\nTable {} Text:\n{}".format(table_index, getTableText(document.tables[table_index]))
 
     # Date
-    print "\n Table {} Date:\n{}".format('0', getDate(document.tables[0]))
+    print "\n Table {} Details:\n{}".format('0', getDetails(document.tables[0]))
 
 
 # =====================================
@@ -90,22 +90,44 @@ def getGSTIndex(table):
 
     return gst_index
 
-# =====================================
-# getDate()
-# Date of invoice
 
-def getDate(table):
-    table_text = getTableText(table)
-
+def regexDate(text_input):
     #Regex search for Dated:
-    date_exists = re.search(r'Dated:\d{2}-[a-zA-z]+-\d{4}', table_text, flags=re.M|re.S)
+    date_exists = re.search(r'Dated:\d{2}-[a-zA-z]+-\d{4}', text_input, flags=re.M|re.S)
 
     if date_exists:
+        #String slice to extract date (6 is position of : in Dated:)
         date = date_exists.group(0)[6:]
     else:
         date = 'N/A'
 
     return date
+
+def regexInvoiceNumber(text_input):
+    inv_number_exists = re.search(r'Invoice No : \d{10,11}', text_input, flags=re.M|re.S)
+
+    if inv_number_exists:
+        #String slice for invoice number (12 is position of : in Invoice No :)
+        inv_no = inv_number_exists.group(0)[12:]
+    else:
+        inv_no = 'N/A'
+
+    return inv_no
+
+# =====================================
+# getDetails()
+# Details from first table of invoice
+
+def getDetails(table):
+    table_text = getTableText(table)
+
+    date = regexDate(table_text)
+    inv_no = regexInvoiceNumber(table_text)
+        
+    print "\nDate:\t\t{}".format(date)
+    print "Invoice Number:\t{}".format(inv_no)
+
+    return (date, inv_no)
 
 # =====================================
 # Runtime 
