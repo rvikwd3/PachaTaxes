@@ -22,8 +22,11 @@ def main():
         # Table text
         print "\nTable {} Text:\n{}".format(table_index, getTableText(document.tables[table_index]))
 
-    # Date
+    # Details
     print "\n Table {} Details:\n{}".format('0', getDetails(document.tables[0]))
+
+    # Expenses
+    print "\n Table {} Expenses:\n{}".format('0', regexExpenses(getTableText(document.tables[0])))
 
 
 # =====================================
@@ -76,6 +79,7 @@ def getTableText(table):
 # Only checks first cell(0,0) of table
 
 def getGSTIndex(table):
+    print "\ngetGSTIndex"
 
     #   Check if GST number is in first cell
     gst_cell = table.cell(0,0).text
@@ -90,6 +94,26 @@ def getGSTIndex(table):
 
     return gst_index
 
+# =====================================
+# getDetails()
+# Details from first table of invoice
+
+def getDetails(table):
+    table_text = getTableText(table)
+
+    #Multicolumn details
+    multicolumn = [] 
+    for i in range(table.columns.__len__()):
+        multicolumn.append((table.cell(1,i).text, table.cell(2,i).text))
+
+    multicolumn.append(('Date', regexDate(table_text)))
+    multicolumn.append(('Inv#', regexInvoiceNumber(table_text)))
+    
+    return multicolumn
+
+# =====================================
+# REGEX FUNCTIONS
+# =====================================
 
 def regexDate(text_input):
     #Regex search for Dated:
@@ -97,7 +121,7 @@ def regexDate(text_input):
 
     if date_exists:
         #String slice to extract date (6 is position of : in Dated:)
-        date = date_exists.group(0)[6:]
+        date = date_exists.group(0)[6:].strip()
     else:
         date = 'N/A'
 
@@ -108,26 +132,24 @@ def regexInvoiceNumber(text_input):
 
     if inv_number_exists:
         #String slice for invoice number (12 is position of : in Invoice No :)
-        inv_no = inv_number_exists.group(0)[12:]
+        inv_no = inv_number_exists.group(0)[12:].strip()
     else:
         inv_no = 'N/A'
 
     return inv_no
 
-# =====================================
-# getDetails()
-# Details from first table of invoice
+def regexExpenses(text_input):
+    cgst = re.search(r'CGST', text_input, flags=re.S|re.M)
+    sgst = re.search(r'SGST', text_input, flags=re.S|re.M)
+    igst = re.search(r'IGST', text_input, flags=re.S|re.M)
+    total = re.search(r'Total Amount', text_input, flags=re.S|re.M)
 
-def getDetails(table):
-    table_text = getTableText(table)
+    print cgst.group[0].strip()
+    print sgst.group[0]
+    print igst.group[0]
+    print total.group[0]
 
-    date = regexDate(table_text)
-    inv_no = regexInvoiceNumber(table_text)
-        
-    print "\nDate:\t\t{}".format(date)
-    print "Invoice Number:\t{}".format(inv_no)
-
-    return (date, inv_no)
+    return "Heya"
 
 # =====================================
 # Runtime 
